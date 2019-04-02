@@ -18,9 +18,9 @@ function isImageDirectory(item) {
 }
 
 async function createDistDirs(items) {
-  await fs.mkdir(__dirname + '/dist').catch(err => {});
+  await fs.mkdir(`${__dirname}/dist`).catch(err => {});
   for(item in items) {
-    await fs.mkdir(item).catch(err => { });
+    await fs.mkdir(`${__dirname}/dist/${item}`).catch(err => { });
   }
   return items;
 }
