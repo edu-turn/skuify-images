@@ -17,6 +17,6 @@ Different environment variables change how the program behaves.
 | DIR_MODE           | Whether or not to search for subdirectories using the regex, or just look for images in the src directory | Boolean   | TRUE                                                    |
 | CHANGE_IMG_NAME    | Whether or not change the name of the image to match the SKU                                              | Boolean   | TRUE                                                    |
 | RESIZE_IMAGE       | Resize the image to the RESIZE_IMAGE_WIDTH variable                                                       | Boolean   | TRUE                                                    |
-| RESIZE_IMAGE_WIDTH | The width to resize the image to.                                                                         | Boolean   | TRUE                                                    |
+| RESIZE_IMAGE_WIDTH | The width to resize the image to.                                                                         | Number   | 2000                                                    |
 | IMAGE_REGEX        | Regex used to identify images.                                                                            | Regex     | `/\.(gif|jpg|jpeg|tiff|png)$/i`                         |
 | SKU_REGEX          | Regex used to identify SKUs                                                                               | Regex     | `/([A-Z]{2}\d{2}[A-Z]{2})|([A-Z]{2}\d{2,4}-\w{2,4})/ig` |
