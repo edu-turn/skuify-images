@@ -3,4 +3,4 @@ dist/
 src/
 dist/
 .DS_Store
-
+*.zip

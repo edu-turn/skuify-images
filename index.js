@@ -1,10 +1,48 @@
 const fs = require('fs-extra');
 const sharp = require('sharp');
 
-const RESIZE_IMAGE = process.env.RESIZE_IMAGE | true;
-const RESIZE_IMAGE_WIDTH = process.env.RESIZE_IMAGE_WIDTH | 2000;
-const IMAGE_REGEX = /\.(gif|jpg|jpeg|tiff|png)$/i;
-const SKU_REGEX = /([A-Z]{2}\d{2}[A-Z]{2})|([A-Z]{2}\d{2,4}-\w{2,4})/ig;
+const DIR_MODE = getEnvBool('DIR_MODE');
+const CHANGE_IMG_NAME = getEnvBool('CHANGE_IMG_NAME');
+const RESIZE_IMAGE = getEnvBool('RESIZE_IMAGE');
+const RESIZE_IMAGE_WIDTH = getEnvInt('RESIZE_IMAGE_WIDTH') || 2000;
+const IMAGE_REGEX = getEnvRegex('IMAGE_REGEX') || /\.(gif|jpg|jpeg|tiff|png)$/i;
+const SKU_REGEX = getEnvRegex('SKU_REGEX') || /([A-Z]{2}\d{2}[A-Z]{2})|([A-Z]{2}\d{2,4}-\w{2,4})/ig;
+
+console.log('Using options', { DIR_MODE, CHANGE_IMG_NAME, RESIZE_IMAGE, RESIZE_IMAGE_WIDTH, IMAGE_REGEX, SKU_REGEX });
+
+const startDate = new Date();
+console.log(`${startDate} - Starting operation`);
+if (DIR_MODE) {
+  getAllImageDirectories()
+    .then(res => createDistDirs(res))
+    .then(res => copyRenameCompressImagesAll(res))
+    .then(() => logEnd())
+    .catch(err => console.error(err));
+} else {
+  createDistDirs([])
+    .then(() => copyRenameCompressImagesDir(''))
+    .then(() => logEnd())
+    .catch(err => console.log(err))
+}
+
+function getEnvBool(key, defaultVal = true) {
+  return process.env[key] === 'false' || process.env[key] === false ? false : defaultVal; 
+}
+
+function getEnvInt(key) {
+  const val = parseInt(process.env[key], 10);
+  return isNaN(val) ? undefined : val;
+}
+
+function getEnvRegex(key) {
+  const val = process.env[key];
+  return val instanceof RegExp ? val : undefined;
+}
+
+function logEnd() {
+  const endDate = new Date();
+  console.log(`${endDate} - Operation complete in ${endDate.getTime() - startDate.getTime()}`);
+}
 
 async function getAllImageDirectories() {
   try {
@@ -48,7 +86,7 @@ async function copyRenameCompressImagesAll(items) {
 }
 
 async function copyRenameCompressImagesDir(dir) {
-  const images = await getDirectoryImages(dir);
+  const images = await getDirectoryImages(`${__dirname}/src/${dir}`);
   const imageProms = images.map((image, index) => {
     return copyCompressImage(image, dir, index)
       .catch(err => console.log())
@@ -59,7 +97,10 @@ async function copyRenameCompressImagesDir(dir) {
 async function copyCompressImage(imageName, dir, index) {
   let imageBuffer;
   const imagePath = `${__dirname}/src/${dir}/${imageName}`;
-  const newImagePath = `${__dirname}/dist/${dir}/${dir}${index}.jpg`;
+  let newImagePath = `${__dirname}/dist/`;
+  newImagePath += DIR_MODE ? dir : '';
+  const newImageName = CHANGE_IMG_NAME ? `${dir}${index}.jpg` : `${imageName}`;
+  const newImage = `${newImagePath}/${newImageName}`;
   if (RESIZE_IMAGE) { 
     imageBuffer = await sharp(imagePath)
     .resize(RESIZE_IMAGE_WIDTH)
@@ -67,17 +108,16 @@ async function copyCompressImage(imageName, dir, index) {
   } else {
     imageBuffer = await sharp(imagePath).toBuffer();
   }
-  await fs.writeFile(newImagePath, imageBuffer);
-  console.log('completed writing new image', newImagePath);
+  await fs.writeFile(newImage, imageBuffer);
+  console.log('completed writing new image', newImage);
   return;
 }
 
 async function getDirectoryImages(dir) {
-  const dirContents = await fs.readdir(`${__dirname}/src/${dir}`);
-  return dirContents.filter(file => file.match(IMAGE_REGEX));
+  const dirContents = await fs.readdir(dir);
+  return getImages(dirContents);
 }
 
-getAllImageDirectories()
-  .then(res => createDistDirs(res))
-  .then(res => copyRenameCompressImagesAll(res))
-  .catch(err => console.error(err));
+function getImages(items) {
+  return items.filter(file => file.match(IMAGE_REGEX));
+}
