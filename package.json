@@ -1,0 +1,32 @@
+{
+  "name": "skuify-images",
+  "version": "0.1.0",
+  "description": "Skuify images",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "rimraf dist",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/edu-turn/skuify-images.git"
+  },
+  "keywords": [
+    "node",
+    "skuify",
+    "image"
+  ],
+  "author": "Eduturn <management@edu-turn.com>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/edu-turn/skuify-images/issues"
+  },
+  "homepage": "https://github.com/edu-turn/skuify-images#readme",
+  "dependencies": {
+    "fs-extra": "^7.0.1",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "rimraf": "^2.6.3"
+  }
+}
