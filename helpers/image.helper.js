@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const sharp = require('sharp');
 
-const { DIR_MODE, CHANGE_IMG_NAME, RESIZE_IMAGE } = require('./env.helper');
+const { DIR_MODE, CHANGE_IMG_NAME, RESIZE_IMAGE, RESIZE_IMAGE_WIDTH } = require('./env.helper');
 
 async function getAllImageDirectories() {
   try {
@@ -58,16 +58,20 @@ async function copyCompressImage(imageName, dir, index) {
   newImagePath += DIR_MODE ? dir : '';
   const newImageName = CHANGE_IMG_NAME ? `${dir}${index}.jpg` : `${imageName}`;
   const newImage = `${newImagePath}/${newImageName}`;
-  if (RESIZE_IMAGE) { 
-    imageBuffer = await sharp(imagePath)
+  const image = await fs.readFile(imagePath);
+  await writeImage(image, newImage);
+}
+
+async function writeImage(image, imagePath) {
+  if (RESIZE_IMAGE) {
+    imageBuffer = await sharp(image)
     .resize(RESIZE_IMAGE_WIDTH)
     .toBuffer();
   } else {
-    imageBuffer = await sharp(imagePath).toBuffer();
+    imageBuffer = await sharp(image).toBuffer();
   }
-  await fs.writeFile(newImage, imageBuffer);
-  console.log('completed writing new image', newImage);
-  return;
+  await fs.writeFile(imagePath, imageBuffer);
+  console.log('completed writing new image', imagePath);
 }
 
 
@@ -78,5 +82,6 @@ module.exports = {
   isImageDirectory,
   getAllImageDirectories,
   getDirectoryImages,
-  getImages
+  getImages,
+  writeImage
 };

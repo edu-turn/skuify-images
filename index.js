@@ -1,4 +1,4 @@
-const { getAllCsvFiles } = require('./helpers/csv.helper');
+const { getAllCsvFiles, readCsvFiles, downloadCsvImagesFromFiles } = require('./helpers/csv.helper');
 const { CSV_MODE, DIR_MODE } = require('./helpers/env.helper');
 const {
   getAllImageDirectories,
@@ -21,7 +21,8 @@ if (DIR_MODE) {
 } else if (CSV_MODE) {
   createDistDirs([])
     .then(() => getAllCsvFiles())
-    .then(res => console.log(res))
+    .then(res => readCsvFiles(res))
+    .then(res => downloadCsvImagesFromFiles(res))
     .then(() => logEnd())
     .catch(err => console.error(err));
 } else {

@@ -23,6 +23,8 @@
   },
   "homepage": "https://github.com/edu-turn/skuify-images#readme",
   "dependencies": {
+    "axios": "^0.18.0",
+    "csv-parse": "^4.3.4",
     "fs-extra": "^7.0.1",
     "path": "^0.12.7",
     "sharp": "^0.22.0"
